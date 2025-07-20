@@ -1,48 +1,68 @@
-DeFi Wallet Credit Scoring – Aave V2 Protocol (100K+ Transactions)
+ Overview
+This project explores user transaction behavior using enhanced wallet-level features derived from raw financial data. The goal is to analyze behavior trends, understand score distributions, and compare rule-based and machine learning-based approaches for wallet scoring.
 
- Problem Statement
+The core components include:
 
-This project aims to develop a machine learning modelthat assigns a **credit score (0–1000)** to each wallet address based on its historical transaction behavior within the Aave V2 protocol. The score reflects responsible or risky behavior, with **higher scores** indicating **trustworthy wallets** and **lower scores** indicating **potentially exploitative or bot-like wallets.
- Input
+Preprocessing and EDA on enhanced transaction features.
 
-- Format: Raw JSON file containing transaction-level data per wallet
-- Actions included:  
-  - `deposit`
-  - `borrow`
-  - `repay`
-  - `redeemunderlying`
-  - `liquidationcall`
+Credit score visualization and segmentation.
 
----
+ML vs. Rule-based score comparison via scatter plots.
 
-## 🏗️ Approach & Architecture
+User segmentation by behavioral metrics.
 
-### ✅ **1. Data Parsing**
-- Efficiently read large JSON file (~87MB) using `ujson` and `pandas`.
-- Flattened nested transaction histories per wallet.
+📁 Contents
+File	Description
+enhanced_wallet_scores.csv	Main dataset containing user-level financial and behavioral features.
+credit_score_distribution.png	Visualization of the distribution of credit scores across users.
+ml_vs_rule_score_scatter.png	Scatter plot comparing ML-based and Rule-based wallet scores.
+analysis.md	Markdown document summarizing visual insights and key takeaways.
+README.md	This file.
 
-### ✅ **2. Feature Engineering**
-Key wallet-level features engineered:
-| Category               | Feature Examples                                                 |
-|------------------------|------------------------------------------------------------------|
-| **Volume**             | Total deposits, borrows, repayments, redemptions                |
-| **Frequency**          | Transaction count per type, total unique days active            |
-| **Temporal Behavior**  | Mean/median time between transactions                           |
-| **Risk Signals**       | Ratio of `liquidationcall` to borrows, early repays, etc.       |
-| **Diversity**          | Number of unique asset types interacted with                    |
-| **Efficiency**         | Ratio of repay-to-borrow volume, usage of full repayment, etc.  |
+📌 Key Features
+✅ Full-dataset used for generating insights and comparisons
 
-All features were normalized and standardized. Outlier detection applied via IQR.
+📉 Credit score analysis across buckets (e.g., Low, Medium, High)
 
-### ✅ **3. Scoring Model**
-- **Algorithm**: `XGBoostRegressor` (chosen for interpretability, performance, and robustness)
-- **Target Score**: A normalized credit score ∈ `[0, 1000]`
-- **Score Mapping**:
-  - Top ~10%: Highly responsible
-  - Middle ~60%: Normal users
-  - Bottom ~10–20%: Potential exploiters or bots
+📊 Wallet feature distributions (transaction count, balance metrics, churn risk)
 
-### ✅ **4. Script Execution**
-Single script:  
-```bash
-python score_wallets.py --input user-transactions.json --output scores.csv
+🔍 Behavioral clustering and segmentation
+
+🤖 Evaluation of Machine Learning scoring models against heuristic rules
+
+📊 Visual Insights
+1. Credit Score Distribution
+
+A clear right-skewed distribution indicates a larger user base with lower scores, highlighting inclusion needs or tighter risk controls.
+
+2. ML vs Rule-based Score
+
+The scatter plot shows linear correlation with minor outliers, suggesting ML scores largely agree with rule-based logic while capturing some edge cases better.
+
+🔍 Sample Features Used
+txn_count — Total number of transactions
+
+wallet_balance — Running balance over 6 months
+
+avg_debit_credit_diff — Average net spend behavior
+
+last_active_days — Days since last transaction (proxy for churn)
+
+risk_bucket — Rule-assigned risk segment
+
+ml_score — ML-predicted wallet score (0–100)
+
+🚀 How to Use
+Clone the repository
+
+bash
+Copy
+Edit
+git clone https://github.com/Ashwinxxx/Transaction_behavior.git
+cd Transaction_behavior
+View analysis
+Open analysis.md to read insights and conclusions.
+
+Extend or retrain
+Use enhanced_wallet_scores.csv with your ML models for further evaluation.
+
