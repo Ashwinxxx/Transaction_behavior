@@ -1,16 +1,48 @@
-# Transaction_behavior
-Enhanced DeFi Credit Scoring System for Aave V2
-Smart Lending, Safer DeFi.
-This system provides dynamic credit scores (0-1000) for Aave V2 blockchain wallets, analyzing on-chain transaction behavior. It combines advanced Machine Learning, risk assessment, and fraud detection to identify reliable users and flag risky or exploitative activities.
+DeFi Wallet Credit Scoring – Aave V2 Protocol (100K+ Transactions)
 
-Why it matters: Unlock smarter lending decisions, enhance risk management, and boost trust in decentralized finance.
+ Problem Statement
 
-Get Started (Quick):
+This project aims to develop a machine learning modelthat assigns a **credit score (0–1000)** to each wallet address based on its historical transaction behavior within the Aave V2 protocol. The score reflects responsible or risky behavior, with **higher scores** indicating **trustworthy wallets** and **lower scores** indicating **potentially exploitative or bot-like wallets.
+ Input
 
-Place your user-wallet-transactions.json in the project folder.
+- Format: Raw JSON file containing transaction-level data per wallet
+- Actions included:  
+  - `deposit`
+  - `borrow`
+  - `repay`
+  - `redeemunderlying`
+  - `liquidationcall`
 
-pip install -r requirements.txt
+---
 
-python main.py
+## 🏗️ Approach & Architecture
 
-Output: Detailed wallet scores (.csv) and insightful visualizations (.png) of user behavior.
+### ✅ **1. Data Parsing**
+- Efficiently read large JSON file (~87MB) using `ujson` and `pandas`.
+- Flattened nested transaction histories per wallet.
+
+### ✅ **2. Feature Engineering**
+Key wallet-level features engineered:
+| Category               | Feature Examples                                                 |
+|------------------------|------------------------------------------------------------------|
+| **Volume**             | Total deposits, borrows, repayments, redemptions                |
+| **Frequency**          | Transaction count per type, total unique days active            |
+| **Temporal Behavior**  | Mean/median time between transactions                           |
+| **Risk Signals**       | Ratio of `liquidationcall` to borrows, early repays, etc.       |
+| **Diversity**          | Number of unique asset types interacted with                    |
+| **Efficiency**         | Ratio of repay-to-borrow volume, usage of full repayment, etc.  |
+
+All features were normalized and standardized. Outlier detection applied via IQR.
+
+### ✅ **3. Scoring Model**
+- **Algorithm**: `XGBoostRegressor` (chosen for interpretability, performance, and robustness)
+- **Target Score**: A normalized credit score ∈ `[0, 1000]`
+- **Score Mapping**:
+  - Top ~10%: Highly responsible
+  - Middle ~60%: Normal users
+  - Bottom ~10–20%: Potential exploiters or bots
+
+### ✅ **4. Script Execution**
+Single script:  
+```bash
+python score_wallets.py --input user-transactions.json --output scores.csv
